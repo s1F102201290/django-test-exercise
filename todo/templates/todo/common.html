@@ -1,0 +1,41 @@
+{% load static %}
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="ja">
+
+  <head>
+    <title>To Do Application</title>
+    <meta charset="UTF-8">
+    <meta name="author" content="INIAD">
+  </head>
+
+  <body>
+    <nav>
+        <div>
+            <div>
+                <ul>
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'account_logout' %}">ログアウト</a></li>
+                    {% else %}
+                    <li><a href="{% url 'account_login' %}">ログイン</a></li>
+                    <li><a href="{% url 'account_signup' %}">新規登録</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div>
+      <strong>{% trans "Messages:" %}</strong>
+      <ul>
+        {% for message in messages %}
+        <li>{{message}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </body>
+</html>
