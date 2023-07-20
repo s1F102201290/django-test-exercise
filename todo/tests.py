@@ -2,6 +2,9 @@ from django.test import TestCase, Client
 from django.utils import timezone
 from datetime import datetime
 from todo.models import Task
+from django.urls import reverse
+from django.http import Http404
+
 
 
 # Create your tests here.
@@ -53,6 +56,13 @@ class TaskModelTestCase(TestCase):
         task.save()
 
         self.assertFalse(task.is_overdue(current))
+    
+    def test_delete_task(self):
+        task = Task(title='task2')
+        task.save()
+        task.delete()
+        with self.assertRaises(Task.DoesNotExist):
+            Task.objects.get(pk=task.id)
 
 
 class TodoViewTestCase(TestCase):
@@ -113,3 +123,4 @@ class TodoViewTestCase(TestCase):
         response = client.get('/1/')
 
         self.assertEqual(response.status_code, 404)
+
