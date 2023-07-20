@@ -2,6 +2,9 @@ from django.test import TestCase, Client
 from django.utils import timezone
 from datetime import datetime
 from todo.models import Task
+from django.urls import reverse
+from django.http import Http404
+
 
 
 # Create your tests here.
@@ -54,6 +57,12 @@ class TaskModelTestCase(TestCase):
 
         self.assertFalse(task.is_overdue(current))
     
+    def test_delete_task(self):
+        task = Task(title='task2')
+        task.save()
+        task.delete()
+        with self.assertRaises(Task.DoesNotExist):
+            Task.objects.get(pk=task.id)
     def test_update_task_name(self):
         due = timezone.make_aware(datetime(2023, 6, 30,
                                            23, 59, 59))
