@@ -63,7 +63,63 @@ class TaskModelTestCase(TestCase):
         task.delete()
         with self.assertRaises(Task.DoesNotExist):
             Task.objects.get(pk=task.id)
+    def test_update_task_name(self):
+        due = timezone.make_aware(datetime(2023, 6, 30,
+                                           23, 59, 59))
+        task = Task(title='task1', due_at=due)
+        task.save()
 
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(task.title, 'task1')
+        self.assertFalse(task.completed)
+        self.assertEqual(task.due_at, due)
+
+        task.title = 'task1_updated'
+        task.save()
+
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(task.title, 'task1_updated')
+        self.assertFalse(task.completed)
+        self.assertEqual(task.due_at, due)
+    
+    def test_update_task_completed(self):
+        due = timezone.make_aware(datetime(2023, 6, 30,
+                                           23, 59, 59))
+        task = Task(title='task1', due_at=due)
+        task.save()
+
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(task.title, 'task1')
+        self.assertFalse(task.completed)
+        self.assertEqual(task.due_at, due)
+
+        task.completed=True
+        task.save()
+
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(task.title, 'task1')
+        self.assertTrue(task.completed)
+        self.assertEqual(task.due_at, due)
+
+    def test_update_task_due_at(self):
+        due = timezone.make_aware(datetime(2023, 6, 30,
+                                           23, 59, 59))
+        task = Task(title='task1', due_at=due)
+        task.save()
+
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(task.title, 'task1')
+        self.assertFalse(task.completed)
+        self.assertEqual(task.due_at, due)
+
+        new_due = timezone.make_aware(datetime(2023, 7, 30, 23, 59, 59))
+        task.due_at = new_due
+        task.save()
+
+        task = Task.objects.get(pk=task.pk)
+        self.assertEqual(task.title, 'task1')
+        self.assertFalse(task.completed)
+        self.assertEqual(task.due_at, new_due)
 
 class TodoViewTestCase(TestCase):
     def test_index_get(self):
@@ -124,3 +180,18 @@ class TodoViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
+    def test_edit_get_success(self):
+        task = Task(title='task1', due_at=timezone.make_aware(datetime(2023, 7, 1)))
+        task.save()
+        client = Client()
+        response = client.get('/{}/update'.format(task.pk))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, 'todo/edit.html')
+        self.assertEqual(response.context['task'], task)
+
+    def test_edit_get_faile(self):
+        client = Client()
+        response = client.get('/1/')
+
+        self.assertEqual(response.status_code, 404)
