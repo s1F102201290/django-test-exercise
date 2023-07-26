@@ -1,14 +1,8 @@
+{% extends 'todo/common.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="ja">
 
-  <head>
-    <title>To Do Application</title>
-    <meta charset="UTF-8">
-    <meta name="author" content="INIAD">
-  </head>
-
-  <body>
+{# commonの{% block content %}ないに表示する内容を記述します。 #}
+{% block content %}
     <h1>Sample To Do Application</h1>
     <p>You can submit tasks from the following form.</p>
     <form action="{% url 'index' %}" method="post">
@@ -48,6 +42,4 @@
       </ul>
     </div>
     {% endfor %}
-  </body>
-
-</html>
+{% endblock %}
